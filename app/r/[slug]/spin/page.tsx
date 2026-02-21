@@ -8,11 +8,34 @@ import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
 const Wheel = dynamic(() => import("@/components/Wheel"), { ssr: false });
 
-const NOOP_SEGMENT: WheelSegment = {
-  id: "__noop__",
-  label: "Better luck next time",
-  emoji: "🙁",
-};
+// 4 empty slots per prize → ~20% of the wheel is coloured, looks honest
+const NOOPS_PER_PRIZE = 4;
+
+function buildPaddedSegments(prizes: WheelSegment[]): {
+  segments: WheelSegment[];
+  mapIndex: (serverIdx: number) => number;
+} {
+  const result: WheelSegment[] = [];
+  const prizePositions: number[] = [];
+  const noopPositions: number[] = [];
+
+  prizes.forEach((prize, i) => {
+    prizePositions[i] = result.length;
+    result.push(prize);
+    for (let j = 0; j < NOOPS_PER_PRIZE; j++) {
+      noopPositions.push(result.length);
+      result.push({ id: `__noop__${i}_${j}`, label: "", emoji: null });
+    }
+  });
+
+  return {
+    segments: result,
+    mapIndex: (serverIdx: number) =>
+      serverIdx < prizes.length
+        ? prizePositions[serverIdx]
+        : noopPositions[Math.floor(Math.random() * noopPositions.length)],
+  };
+}
 
 interface RestaurantData {
   id: string;
@@ -34,6 +57,7 @@ export default function SpinPage() {
   const [rateLimited, setRateLimited] = useState<{ nextEligibleAt: string | null } | null>(null);
   const spinResultRef = useRef<{ spinId: string; outcome: string } | null>(null);
   const fpRef = useRef<string>("");
+  const mapIndexRef = useRef<(idx: number) => number>((i) => i);
 
   // Load restaurant + prizes
   useEffect(() => {
@@ -42,7 +66,9 @@ export default function SpinPage() {
       .then((data) => {
         if (data.error) throw new Error(data.error);
         setRestaurant(data);
-        setSegments([...data.prizes, NOOP_SEGMENT]);
+        const { segments: padded, mapIndex } = buildPaddedSegments(data.prizes);
+        setSegments(padded);
+        mapIndexRef.current = mapIndex;
       })
       .catch(() => setError("Could not load this promotion."))
       .finally(() => setLoading(false));
@@ -84,7 +110,7 @@ export default function SpinPage() {
 
       const data = await res.json();
       spinResultRef.current = { spinId: data.spinId, outcome: data.outcome };
-      setTargetIndex(data.segmentIndex);
+      setTargetIndex(mapIndexRef.current(data.segmentIndex));
       // spinning stays true — wheel animation will call onSpinComplete
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");

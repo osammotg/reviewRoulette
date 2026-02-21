@@ -1,8 +1,21 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require("../app/generated/prisma/client");
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../app/generated/prisma/client";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+// Parse URL manually to avoid pg's conflicting SSL/channel_binding handling
+const rawUrl = new URL(process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "");
+const pool = new Pool({
+  host: rawUrl.hostname,
+  port: rawUrl.port ? parseInt(rawUrl.port) : 5432,
+  database: rawUrl.pathname.slice(1),
+  user: decodeURIComponent(rawUrl.username),
+  password: decodeURIComponent(rawUrl.password),
+  ssl: { rejectUnauthorized: false },
+  max: 1,
+});
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter } as ConstructorParameters<typeof PrismaClient>[0]);
 
 async function main() {
   // Admin user
@@ -21,7 +34,7 @@ async function main() {
     create: {
       name: "Demo Café",
       slug: "demo-cafe",
-      googleUrl: "https://maps.google.com/?cid=1234567890",
+      googleUrl: "https://maps.google.com/?cid=14231911511596925546",
       timezone: "Europe/Zurich",
       dailyWinCap: 50,
     },
@@ -69,4 +82,7 @@ async function main() {
 
 main()
   .catch(console.error)
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+    await pool.end();
+  });

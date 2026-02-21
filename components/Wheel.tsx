@@ -12,26 +12,32 @@ export interface WheelSegment {
 
 interface WheelProps {
   segments: WheelSegment[];
-  targetIndex: number | null; // null = not yet spun
+  targetIndex: number | null;
   onSpinComplete: () => void;
   isSpinning: boolean;
 }
 
-const COLORS = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#45B7D1",
-  "#96CEB4",
-  "#FFEAA7",
-  "#DDA0DD",
-  "#98D8C8",
-  "#F7DC6F",
-  "#BB8FCE",
-  "#85C1E9",
+// Curated premium palette — muted, not rainbow
+const PRIZE_COLORS = [
+  "#6366F1", // indigo
+  "#8B5CF6", // violet
+  "#EC4899", // pink
+  "#F59E0B", // amber
+  "#10B981", // emerald
+  "#3B82F6", // blue
+  "#EF4444", // red
+  "#F97316", // orange
 ];
 
-const NOOP_COLOR = "#9CA3AF";
-const SPIN_DURATION_MS = 4000;
+const NOOP_A = "#0C0C10";
+const NOOP_B = "#0F0F15";
+const SPIN_DURATION_MS = 4500;
+const SIZE = 380; // logical px
+const SCALE = 2;  // retina 2×
+
+function isNoop(id: string) {
+  return id.startsWith("__noop__");
+}
 
 export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinning }: WheelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -45,69 +51,137 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
 
   const segDeg = 360 / segments.length;
 
-  const drawWheel = useCallback(
-    (rotation: number) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+  const drawWheel = useCallback((rotation: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-      const size = canvas.width;
-      const cx = size / 2;
-      const cy = size / 2;
-      const radius = size / 2 - 4;
+    // Use setTransform to avoid cumulative scale stacking across frames
+    ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    ctx.clearRect(0, 0, SIZE, SIZE);
 
-      ctx.clearRect(0, 0, size, size);
+    const cx = SIZE / 2;
+    const cy = SIZE / 2;
+    const radius = SIZE / 2 - 14;   // segment outer edge
+    const rimR   = SIZE / 2 - 4;    // decorative rim
 
-      const segRad = (2 * Math.PI) / segments.length;
-      const rotRad = (rotation * Math.PI) / 180;
+    const segRad = (2 * Math.PI) / segments.length;
+    const rotRad = (rotation * Math.PI) / 180;
 
-      segments.forEach((seg, i) => {
-        const startAngle = rotRad + i * segRad - Math.PI / 2;
-        const endAngle = startAngle + segRad;
+    let prizeIdx = 0;
+    let noopIdx  = 0;
 
-        // Segment fill
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, radius, startAngle, endAngle);
-        ctx.closePath();
-        ctx.fillStyle = seg.id === "__noop__" ? NOOP_COLOR : COLORS[i % COLORS.length];
+    // ── Segments ────────────────────────────────────────────────────────────
+    segments.forEach((seg, i) => {
+      const startAngle = rotRad + i * segRad - Math.PI / 2;
+      const endAngle   = startAngle + segRad;
+      const noop = isNoop(seg.id);
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, startAngle, endAngle);
+      ctx.closePath();
+
+      if (noop) {
+        ctx.fillStyle = noopIdx++ % 2 === 0 ? NOOP_A : NOOP_B;
         ctx.fill();
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 2;
+        // Very subtle divider between noop slices
+        ctx.strokeStyle = "rgba(255,255,255,0.025)";
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      } else {
+        const color = PRIZE_COLORS[prizeIdx++ % PRIZE_COLORS.length];
+        // Subtle centre-to-rim gradient — brighter toward rim
+        const g = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius);
+        g.addColorStop(0, color + "BB");
+        g.addColorStop(1, color);
+        ctx.fillStyle = g;
+        ctx.fill();
+        // Crisp border on prize slices so they pop
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.lineWidth = 0.75;
         ctx.stroke();
 
-        // Label
+        // ── Prize label ───────────────────────────────────────────────────
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(startAngle + segRad / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#fff";
-        ctx.font = `bold ${Math.max(10, Math.min(14, size / segments.length / 2))}px system-ui`;
-        ctx.shadowColor = "rgba(0,0,0,0.4)";
+
+        const emoji  = seg.emoji ?? "★";
+        const textR  = radius * 0.79;
+
+        ctx.shadowColor = "rgba(0,0,0,0.9)";
+        ctx.shadowBlur  = 6;
+        ctx.textAlign   = "right";
+
+        // Emoji
+        ctx.font      = "13px -apple-system, system-ui, sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(emoji, textR, 4);
+
+        // Short label
+        ctx.font      = "bold 8.5px -apple-system, system-ui, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
         ctx.shadowBlur = 3;
+        ctx.fillText(truncate(seg.label, 9), textR - 17, 4);
 
-        const emoji = seg.emoji ?? "";
-        const textRadius = radius * 0.72;
-        ctx.fillText(emoji + " " + truncate(seg.label, 12), textRadius, 5);
         ctx.restore();
-      });
+      }
+    });
 
-      // Center circle
-      ctx.beginPath();
-      ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
-      ctx.fillStyle = "#1F2937";
-      ctx.fill();
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-    },
-    [segments]
-  );
+    // ── Decorative rim ───────────────────────────────────────────────────────
+    ctx.shadowBlur = 0;
 
-  // Easing: starts fast, decelerates smoothly
+    // Outer rim ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, rimR, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgba(255,255,255,0.07)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Inner edge highlight just inside the segments
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgba(255,255,255,0.04)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // ── Centre hub ───────────────────────────────────────────────────────────
+    // Shadow
+    ctx.shadowColor = "rgba(0,0,0,1)";
+    ctx.shadowBlur  = 24;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
+    ctx.fillStyle = "#070710";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Outer hub ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgba(255,255,255,0.13)";
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+    // Inner hub ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    ctx.lineWidth   = 1;
+    ctx.stroke();
+
+    // Centre dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4.5, 0, 2 * Math.PI);
+    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    ctx.fill();
+
+  }, [segments]);
+
   function easeOut(t: number): number {
-    return 1 - Math.pow(1 - t, 3);
+    // Smooth deceleration with a slight overshoot feel at the end
+    return 1 - Math.pow(1 - t, 3.5);
   }
 
   useEffect(() => {
@@ -119,52 +193,45 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
 
     hasCompletedRef.current = false;
 
-    // Calculate the angle so the pointer (top/12-o'clock) lands on targetIndex segment center
     const targetSegCenter = targetIndex * segDeg + segDeg / 2;
     const currentNorm = ((rotationRef.current % 360) + 360) % 360;
     const needed = ((360 - targetSegCenter) - currentNorm + 360) % 360;
-    const fullSpins = 360 * 6; // 6 full rotations for drama
+    const fullSpins = 360 * 7;
     const totalDelta = fullSpins + needed;
 
-    startAngleRef.current = rotationRef.current;
+    startAngleRef.current  = rotationRef.current;
     targetAngleRef.current = rotationRef.current + totalDelta;
-    startTimeRef.current = performance.now();
+    startTimeRef.current   = performance.now();
 
-    // Tick sound: AudioContext one-shot oscillator
     let tickContext: AudioContext | null = null;
-    try {
-      tickContext = new AudioContext();
-    } catch {
-      // AudioContext not available — silent
-    }
+    try { tickContext = new AudioContext(); } catch { /* silent */ }
 
     let lastTickSegment = -1;
 
     function tick(now: number) {
       const elapsed = now - startTimeRef.current;
-      const t = Math.min(elapsed / SPIN_DURATION_MS, 1);
-      const eased = easeOut(t);
+      const t       = Math.min(elapsed / SPIN_DURATION_MS, 1);
+      const eased   = easeOut(t);
       const current = startAngleRef.current + eased * totalDelta;
 
       rotationRef.current = current;
       setDisplayRotation(current);
       drawWheel(current);
 
-      // Tick on segment boundary
-      const normalised = ((current % 360) + 360) % 360;
-      const currentSeg = Math.floor(normalised / segDeg);
+      // Tick sound on each segment crossing
+      const normalised  = ((current % 360) + 360) % 360;
+      const currentSeg  = Math.floor(normalised / segDeg);
       if (currentSeg !== lastTickSegment && tickContext) {
         lastTickSegment = currentSeg;
-        // Click sound
-        const osc = tickContext.createOscillator();
+        const osc  = tickContext.createOscillator();
         const gain = tickContext.createGain();
         osc.connect(gain);
         gain.connect(tickContext.destination);
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.08, tickContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, tickContext.currentTime + 0.06);
+        osc.frequency.value = 900;
+        gain.gain.setValueAtTime(0.04, tickContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, tickContext.currentTime + 0.04);
         osc.start(tickContext.currentTime);
-        osc.stop(tickContext.currentTime + 0.06);
+        osc.stop(tickContext.currentTime + 0.04);
       }
 
       if (t < 1) {
@@ -174,43 +241,67 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
         drawWheel(targetAngleRef.current);
         if (!hasCompletedRef.current) {
           hasCompletedRef.current = true;
-          setTimeout(onSpinComplete, 400);
+          setTimeout(onSpinComplete, 500);
         }
       }
     }
 
     animFrameRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      cancelAnimationFrame(animFrameRef.current);
-    };
+    return () => { cancelAnimationFrame(animFrameRef.current); };
   }, [isSpinning, targetIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative flex items-center justify-center">
-      {/* Pointer */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 z-10"
-        style={{ marginTop: -2 }}
+
+      {/* Pointer — minimal white teardrop */}
+      <svg
+        width="18"
+        height="32"
+        viewBox="0 0 18 32"
+        className="absolute left-1/2 -translate-x-1/2 z-10"
+        style={{ top: 0, marginTop: -20 }}
       >
-        <div
-          style={{
-            width: 0,
-            height: 0,
-            borderLeft: "12px solid transparent",
-            borderRight: "12px solid transparent",
-            borderTop: "28px solid #EF4444",
-            filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))",
-          }}
+        <defs>
+          <filter id="ptr-shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="rgba(0,0,0,0.7)" />
+          </filter>
+        </defs>
+        {/* Teardrop: circle top, tapers to a point at bottom */}
+        <path
+          d="M9 32 C4 22, 0 15, 0 9 A9 9 0 0 1 18 9 C18 15, 14 22, 9 32 Z"
+          fill="white"
+          fillOpacity="0.96"
+          filter="url(#ptr-shadow)"
         />
-      </div>
+        {/* Inner highlight */}
+        <circle cx="9" cy="9" r="4" fill="rgba(255,255,255,0.4)" />
+      </svg>
+
+      {/* Outer glow / depth ring */}
+      <div
+        style={{
+          position: "absolute",
+          width: SIZE,
+          height: SIZE,
+          borderRadius: "50%",
+          boxShadow:
+            "0 0 0 1px rgba(255,255,255,0.06), " +
+            "0 24px 80px rgba(0,0,0,0.7), " +
+            "0 4px 24px rgba(0,0,0,0.5)",
+          pointerEvents: "none",
+        }}
+      />
 
       <canvas
         ref={canvasRef}
-        width={320}
-        height={320}
-        className="rounded-full shadow-2xl"
-        style={{ touchAction: "none" }}
+        width={SIZE * SCALE}
+        height={SIZE * SCALE}
+        style={{
+          width: SIZE,
+          height: SIZE,
+          borderRadius: "50%",
+          touchAction: "none",
+        }}
       />
     </div>
   );
