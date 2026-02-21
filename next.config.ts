@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      // Allow any HTTPS image URL for logo/prize images
+      { protocol: "https", hostname: "**" },
+    ],
+  },
 };
 
 export default nextConfig;

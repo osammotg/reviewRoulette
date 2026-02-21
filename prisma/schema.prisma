@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+model Restaurant {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  logoUrl     String?  @map("logo_url")
+  googleUrl   String?  @map("google_url")
+  active      Boolean  @default(true)
+  timezone    String   @default("Europe/Zurich")
+  dailyWinCap Int?     @map("daily_win_cap")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  prizes                  Prize[]
+  spins                   Spin[]
+  analyticsEvents         AnalyticsEvent[]
+  restaurantDailyCounters RestaurantDailyCounter[]
+
+  @@map("restaurants")
+}
+
+model Prize {
+  id           String   @id @default(uuid())
+  restaurantId String   @map("restaurant_id")
+  label        String
+  description  String?
+  imageUrl     String?  @map("image_url")
+  emoji        String?
+  weight       Int
+  dailyCap     Int?     @map("daily_cap")
+  active       Boolean  @default(true)
+  isFallback   Boolean  @default(false) @map("is_fallback")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  restaurant      Restaurant          @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  spins           Spin[]
+  dailyCounters   PrizeDailyCounter[]
+  analyticsEvents AnalyticsEvent[]
+
+  @@map("prizes")
+}
+
+model PrizeDailyCounter {
+  id      String @id @default(uuid())
+  prizeId String @map("prize_id")
+  date    String // "2025-01-15" in restaurant's local timezone
+  claims  Int    @default(0)
+
+  prize Prize @relation(fields: [prizeId], references: [id], onDelete: Cascade)
+
+  @@unique([prizeId, date])
+  @@map("prize_daily_counters")
+}
+
+model RestaurantDailyCounter {
+  id           String @id @default(uuid())
+  restaurantId String @map("restaurant_id")
+  date         String // "2025-01-15" in restaurant's local timezone
+  totalWins    Int    @default(0) @map("total_wins")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, date])
+  @@map("restaurant_daily_counters")
+}
+
+model Spin {
+  id              String    @id @default(uuid())
+  restaurantId    String    @map("restaurant_id")
+  deviceHash      String    @map("device_hash")
+  ipHash          String    @map("ip_hash")
+  prizeId         String?   @map("prize_id")
+  claimToken      String?   @unique @map("claim_token")
+  claimTokenShort String?   @map("claim_token_short")
+  claimedAt       DateTime? @map("claimed_at")
+  spunAt          DateTime  @default(now()) @map("spun_at")
+
+  restaurant      Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  prize           Prize?           @relation(fields: [prizeId], references: [id])
+  analyticsEvents AnalyticsEvent[]
+
+  @@index([deviceHash, spunAt])
+  @@index([ipHash, spunAt])
+  @@map("spins")
+}
+
+model AnalyticsEvent {
+  id           String   @id @default(uuid())
+  restaurantId String   @map("restaurant_id")
+  eventType    String   @map("event_type")
+  prizeId      String?  @map("prize_id")
+  spinId       String?  @map("spin_id")
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  prize      Prize?     @relation(fields: [prizeId], references: [id])
+  spin       Spin?      @relation(fields: [spinId], references: [id])
+
+  @@index([restaurantId, createdAt])
+  @@index([restaurantId, eventType, createdAt])
+  @@map("analytics_events")
+}
