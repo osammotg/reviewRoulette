@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import DevToolbar from "@/components/DevToolbar";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${geist.variable} font-sans antialiased bg-[#F8F5F0] text-[#1F2937]`}>
         {children}
+        <DevToolbar />
       </body>
     </html>
   );

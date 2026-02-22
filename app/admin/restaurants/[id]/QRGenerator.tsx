@@ -4,11 +4,28 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import Image from "next/image";
 
+const LS_KEY = "qr_use_localhost";
+
 export default function QRGenerator({ slug }: { slug: string }) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [useLocalhost, setUseLocalhost] = useState(false);
+
+  // Sync with dev toolbar toggle
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+    setUseLocalhost(localStorage.getItem(LS_KEY) === "1");
+    function handle() {
+      setUseLocalhost(localStorage.getItem(LS_KEY) === "1");
+    }
+    window.addEventListener("qr-host-changed", handle);
+    return () => window.removeEventListener("qr-host-changed", handle);
+  }, []);
+
   const appUrl =
     typeof window !== "undefined"
-      ? process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin
+      ? process.env.NODE_ENV === "development" && useLocalhost
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin
       : "";
   const landingUrl = `${appUrl}/r/${slug}`;
 

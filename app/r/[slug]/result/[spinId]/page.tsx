@@ -37,6 +37,18 @@ export default function ResultPage() {
   const [error, setError] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [aged, setAged] = useState(false);
+  const [useLocalhost, setUseLocalhost] = useState(false);
+
+  // Sync with dev toolbar toggle
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+    setUseLocalhost(localStorage.getItem("qr_use_localhost") === "1");
+    function handle() {
+      setUseLocalhost(localStorage.getItem("qr_use_localhost") === "1");
+    }
+    window.addEventListener("qr-host-changed", handle);
+    return () => window.removeEventListener("qr-host-changed", handle);
+  }, []);
 
   useEffect(() => {
     fetch(`/api/spin/${spinId}`)
@@ -52,12 +64,15 @@ export default function ResultPage() {
   // Generate QR code for claim token
   useEffect(() => {
     if (!result?.claimToken) return;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+    const appUrl =
+      process.env.NODE_ENV === "development" && useLocalhost
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
     const claimUrl = `${appUrl}/cashier/${result.claimToken}`;
     QRCode.toDataURL(claimUrl, { width: 180, margin: 2, color: { dark: "#111827", light: "#ffffff" } })
       .then(setQrDataUrl)
       .catch(() => {});
-  }, [result?.claimToken]);
+  }, [result?.claimToken, useLocalhost]);
 
   // Aging check — re-evaluate every 30 seconds
   useEffect(() => {
