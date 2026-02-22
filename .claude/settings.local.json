@@ -12,7 +12,10 @@
       "Bash(npm run build:*)",
       "Bash(npm ls:*)",
       "Bash(git -C /Users/admin/Documents/50projects/ReviewRoulette init)",
-      "Bash(git -C /Users/admin/Documents/50projects/ReviewRoulette add -A)"
+      "Bash(git -C /Users/admin/Documents/50projects/ReviewRoulette add -A)",
+      "Bash(claude mcp list:*)",
+      "Bash(npm run db:seed:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }

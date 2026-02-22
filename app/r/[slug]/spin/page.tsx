@@ -126,19 +126,19 @@ export default function SpinPage() {
 
   if (loading) {
     return (
-      <main className="min-h-dvh flex items-center justify-center">
-        <div className="text-gray-400 animate-pulse text-lg">Loading...</div>
+      <main className="min-h-dvh flex items-center justify-center bg-[#F8F5F0]">
+        <div className="text-[#9CA3AF] animate-pulse text-lg">Loading...</div>
       </main>
     );
   }
 
   if (error && !spinning) {
     return (
-      <main className="min-h-dvh flex flex-col items-center justify-center px-6 gap-4">
-        <p className="text-red-400 text-center">{error}</p>
+      <main className="min-h-dvh flex flex-col items-center justify-center px-6 gap-4 bg-[#F8F5F0]">
+        <p className="text-[#DC2626] text-center">{error}</p>
         <button
           onClick={() => setError(null)}
-          className="text-gray-400 underline text-sm"
+          className="text-[#9CA3AF] underline text-sm"
         >
           Try again
         </button>
@@ -155,27 +155,27 @@ export default function SpinPage() {
       : null;
 
     return (
-      <main className="min-h-dvh flex flex-col items-center justify-center px-6 text-center gap-6">
+      <main className="min-h-dvh flex flex-col items-center justify-center px-6 text-center gap-6 bg-[#F8F5F0]">
         <div className="text-5xl">⏳</div>
-        <h2 className="text-2xl font-bold">Already spun today</h2>
-        <p className="text-gray-400">
+        <h2 className="text-[22px] font-semibold text-[#1F2937]">Already spun today</h2>
+        <p className="text-[#6B7280]">
           You&apos;ve already spun today. Come back tomorrow
           {next ? ` after ${next}` : ""}.
         </p>
-        <p className="text-gray-600 text-sm">One spin per day, per device.</p>
+        <p className="text-[#9CA3AF] text-sm">One spin per day, per device.</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-dvh flex flex-col items-center justify-center px-4 py-8 safe-top safe-bottom gap-8">
+    <main className="min-h-dvh flex flex-col items-center justify-center px-4 py-8 bg-[#F8F5F0] safe-top safe-bottom gap-8">
       {restaurant && (
-        <p className="text-gray-400 text-sm font-medium tracking-wide uppercase">
+        <p className="text-[#9CA3AF] text-sm font-medium tracking-wide uppercase">
           {restaurant.name}
         </p>
       )}
 
-      <h1 className="text-3xl font-extrabold text-white text-center">
+      <h1 className="text-[30px] font-semibold text-[#1F2937] text-center">
         Spin the wheel
       </h1>
 
@@ -191,12 +191,12 @@ export default function SpinPage() {
       <button
         onClick={handleSpin}
         disabled={spinning}
-        className="w-full max-w-xs bg-red-500 hover:bg-red-600 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold text-xl rounded-2xl py-5 shadow-lg active:scale-95 transition-all"
+        className="w-full max-w-xs bg-[#D97706] hover:bg-[#B45309] disabled:bg-[#F1ECE4] disabled:text-[#9CA3AF] text-white font-bold text-xl rounded-full py-5 shadow-[0_4px_20px_rgba(217,119,6,0.25)] active:scale-95 transition-all"
       >
         {spinning ? "Spinning…" : "Spin"}
       </button>
 
-      <p className="text-xs text-gray-600 text-center max-w-xs">
+      <p className="text-xs text-[#9CA3AF] text-center max-w-xs">
         One spin per day. No purchase required.
       </p>
     </main>

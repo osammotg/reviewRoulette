@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Prize, Restaurant } from "@/app/generated/prisma/client";
 
 const INPUT_CLASS =
-  "w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 text-sm";
+  "w-full bg-white border border-[#E5E0D8] rounded-xl px-3 py-2 text-[#1F2937] placeholder-[#9CA3AF] focus:outline-none focus:border-[#D97706] text-sm";
 
 interface PrizeForm {
   label: string;
@@ -133,13 +133,13 @@ export default function PrizeManager({
   }
 
   return (
-    <section className="bg-gray-900 rounded-2xl p-5 space-y-4">
+    <section className="bg-white rounded-2xl p-5 space-y-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-base">Prizes ({prizes.length})</h2>
+        <h2 className="font-semibold text-base text-[#1F2937]">Prizes ({prizes.length})</h2>
         {!showForm && (
           <button
             onClick={startNew}
-            className="text-sm text-white bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-xl"
+            className="text-sm text-[#6B7280] hover:text-[#1F2937] bg-[#F1ECE4] hover:bg-[#E5DDD0] px-3 py-1.5 rounded-xl transition-colors"
           >
             + Add prize
           </button>
@@ -152,21 +152,21 @@ export default function PrizeManager({
           <div
             key={p.id}
             className={`flex items-center justify-between p-3 rounded-xl ${
-              p.active ? "bg-gray-800" : "bg-gray-850 opacity-50"
+              p.active ? "bg-[#F8F5F0]" : "bg-[#F8F5F0] opacity-50"
             }`}
           >
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-xl">{p.emoji ?? "🎁"}</span>
               <div className="min-w-0">
-                <span className="font-medium text-sm text-white truncate block">
+                <span className="font-medium text-sm text-[#1F2937] truncate block">
                   {p.label}
                   {p.isFallback && (
-                    <span className="ml-1.5 text-xs bg-amber-900 text-amber-300 px-1.5 py-0.5 rounded-full">
+                    <span className="ml-1.5 text-xs bg-[#FDE6C8] text-[#D97706] px-1.5 py-0.5 rounded-full">
                       fallback
                     </span>
                   )}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-[#9CA3AF]">
                   weight {p.weight}
                   {p.dailyCap ? ` · cap ${p.dailyCap}/day` : " · unlimited"}
                 </span>
@@ -175,23 +175,23 @@ export default function PrizeManager({
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => handleToggleActive(p)}
-                className={`text-xs px-2 py-1 rounded-lg ${
+                className={`text-xs px-2 py-1 rounded-lg transition-colors ${
                   p.active
-                    ? "bg-emerald-900 text-emerald-300"
-                    : "bg-gray-700 text-gray-400"
+                    ? "bg-[#FDE6C8] text-[#D97706]"
+                    : "bg-[#F1ECE4] text-[#9CA3AF]"
                 }`}
               >
                 {p.active ? "Active" : "Off"}
               </button>
               <button
                 onClick={() => startEdit(p)}
-                className="text-xs text-gray-400 hover:text-white px-2 py-1 rounded-lg bg-gray-700"
+                className="text-xs text-[#6B7280] hover:text-[#1F2937] px-2 py-1 rounded-lg bg-[#F1ECE4] transition-colors"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(p.id, p.label)}
-                className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded-lg bg-gray-700"
+                className="text-xs text-[#DC2626] hover:text-red-700 px-2 py-1 rounded-lg bg-[#F1ECE4] transition-colors"
               >
                 ×
               </button>
@@ -204,15 +204,15 @@ export default function PrizeManager({
       {showForm && (
         <form
           onSubmit={handleSave}
-          className="border border-gray-700 rounded-2xl p-4 space-y-3 mt-2"
+          className="border border-[#E5E0D8] rounded-2xl p-4 space-y-3 mt-2 bg-[#F8F5F0]"
         >
-          <h3 className="text-sm font-semibold text-gray-300">
+          <h3 className="text-sm font-semibold text-[#1F2937]">
             {editingId ? "Edit prize" : "New prize"}
           </h3>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <label className="text-xs text-gray-400 mb-1 block">Label *</label>
+              <label className="text-xs text-[#6B7280] mb-1 block">Label *</label>
               <input
                 type="text"
                 value={form.label}
@@ -224,7 +224,7 @@ export default function PrizeManager({
             </div>
 
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">Emoji</label>
+              <label className="text-xs text-[#6B7280] mb-1 block">Emoji</label>
               <input
                 type="text"
                 value={form.emoji}
@@ -236,7 +236,7 @@ export default function PrizeManager({
             </div>
 
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">
+              <label className="text-xs text-[#6B7280] mb-1 block">
                 Weight
               </label>
               <input
@@ -250,7 +250,7 @@ export default function PrizeManager({
             </div>
 
             <div className="col-span-2">
-              <label className="text-xs text-gray-400 mb-1 block">Image URL</label>
+              <label className="text-xs text-[#6B7280] mb-1 block">Image URL</label>
               <input
                 type="url"
                 value={form.imageUrl}
@@ -261,7 +261,7 @@ export default function PrizeManager({
             </div>
 
             <div className="col-span-2">
-              <label className="text-xs text-gray-400 mb-1 block">Description</label>
+              <label className="text-xs text-[#6B7280] mb-1 block">Description</label>
               <input
                 type="text"
                 value={form.description}
@@ -272,7 +272,7 @@ export default function PrizeManager({
             </div>
 
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">
+              <label className="text-xs text-[#6B7280] mb-1 block">
                 Daily cap
               </label>
               <input
@@ -293,7 +293,7 @@ export default function PrizeManager({
                   onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
                   className="w-3.5 h-3.5"
                 />
-                <span className="text-xs text-gray-300">Active</span>
+                <span className="text-xs text-[#6B7280]">Active</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -304,25 +304,25 @@ export default function PrizeManager({
                   }
                   className="w-3.5 h-3.5"
                 />
-                <span className="text-xs text-gray-300">Use as fallback</span>
+                <span className="text-xs text-[#6B7280]">Use as fallback</span>
               </label>
             </div>
           </div>
 
-          {error && <p className="text-red-400 text-xs">{error}</p>}
+          {error && <p className="text-[#DC2626] text-xs">{error}</p>}
 
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={saving}
-              className="bg-white text-gray-900 font-semibold px-4 py-2 rounded-xl text-sm disabled:opacity-50"
+              className="bg-[#D97706] hover:bg-[#B45309] text-white font-semibold px-4 py-2 rounded-full text-sm disabled:opacity-50 transition-colors"
             >
               {saving ? "Saving..." : editingId ? "Save changes" : "Add prize"}
             </button>
             <button
               type="button"
               onClick={cancelForm}
-              className="text-gray-400 hover:text-white px-4 py-2 rounded-xl bg-gray-700 text-sm"
+              className="text-[#6B7280] hover:text-[#1F2937] px-4 py-2 rounded-xl bg-[#F1ECE4] text-sm transition-colors"
             >
               Cancel
             </button>

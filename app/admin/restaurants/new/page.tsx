@@ -71,11 +71,11 @@ export default function NewRestaurantPage() {
   return (
     <div className="max-w-xl mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/admin" className="text-gray-400 hover:text-white text-sm">
+        <Link href="/admin" className="text-[#6B7280] hover:text-[#1F2937] text-sm transition-colors">
           ← Restaurants
         </Link>
-        <span className="text-gray-600">/</span>
-        <h1 className="text-xl font-bold">New restaurant</h1>
+        <span className="text-[#9CA3AF]">/</span>
+        <h1 className="text-xl font-semibold text-[#1F2937]">New restaurant</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -147,19 +147,19 @@ export default function NewRestaurantPage() {
           />
         </Field>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && <p className="text-[#DC2626] text-sm">{error}</p>}
 
         <div className="flex gap-3 pt-2">
           <button
             type="submit"
             disabled={loading}
-            className="bg-white text-gray-900 font-semibold px-6 py-3 rounded-xl disabled:opacity-50"
+            className="bg-[#D97706] hover:bg-[#B45309] text-white font-semibold px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
           >
             {loading ? "Creating..." : "Create restaurant"}
           </button>
           <Link
             href="/admin"
-            className="text-gray-400 hover:text-white px-6 py-3 rounded-xl bg-gray-800 font-medium"
+            className="text-[#6B7280] hover:text-[#1F2937] px-6 py-3 rounded-xl bg-[#F1ECE4] font-medium transition-colors"
           >
             Cancel
           </Link>
@@ -170,7 +170,7 @@ export default function NewRestaurantPage() {
 }
 
 const INPUT_CLASS =
-  "w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500";
+  "w-full bg-white border border-[#E5E0D8] rounded-xl px-4 py-3 text-[#1F2937] placeholder-[#9CA3AF] focus:outline-none focus:border-[#D97706]";
 
 function Field({
   label,
@@ -183,9 +183,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm text-gray-300 mb-1">
+      <label className="block text-sm text-[#6B7280] mb-1">
         {label}
-        {hint && <span className="text-gray-500 ml-2 text-xs">{hint}</span>}
+        {hint && <span className="text-[#9CA3AF] ml-2 text-xs">{hint}</span>}
       </label>
       {children}
     </div>

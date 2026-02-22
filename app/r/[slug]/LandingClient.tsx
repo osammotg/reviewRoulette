@@ -52,60 +52,60 @@ export default function LandingClient({ restaurant }: Props) {
   }
 
   return (
-    <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-12 safe-top safe-bottom">
+    <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-12 bg-[#F8F5F0] safe-top safe-bottom">
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
         {/* Logo / Restaurant name */}
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-4">
           {restaurant.logoUrl ? (
             <Image
               src={restaurant.logoUrl}
               alt={restaurant.name}
-              width={80}
-              height={80}
-              className="rounded-2xl shadow-lg"
+              width={96}
+              height={96}
+              className="rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
             />
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-gray-800 flex items-center justify-center text-3xl">
+            <div className="w-24 h-24 rounded-[20px] bg-[#F1ECE4] flex items-center justify-center text-4xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
               🍽️
             </div>
           )}
-          <h1 className="text-2xl font-bold text-white text-center">
+          <h2 className="text-lg font-semibold text-[#6B7280] text-center">
             {restaurant.name}
-          </h1>
+          </h2>
         </div>
 
         {/* Hero text */}
-        <div className="text-center space-y-2">
-          <p className="text-4xl font-extrabold text-white tracking-tight">
+        <div className="text-center space-y-3">
+          <h1 className="text-[30px] font-semibold text-[#1F2937] tracking-tight">
             Spin &amp; Win
-          </p>
-          <p className="text-gray-400 text-base">
+          </h1>
+          <p className="text-[#6B7280] text-base">
             Tap spin for a chance to win a reward. No purchase required.
           </p>
         </div>
 
         {/* Actions */}
-        <div className="w-full flex flex-col gap-3">
+        <div className="w-full flex flex-col gap-4">
           {restaurant.googleUrl && (
             <button
               onClick={handleReviewClick}
-              className="w-full bg-white text-gray-900 font-semibold rounded-2xl py-4 px-6 text-base flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"
+              className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-semibold rounded-full py-4 px-6 text-base flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(217,119,6,0.25)] active:scale-95 transition-all"
             >
               <span>⭐</span>
               <span>Leave a Google review first</span>
-              <span className="text-xs text-gray-500 ml-auto">↗</span>
+              <span className="text-amber-200 ml-auto text-sm">↗</span>
             </button>
           )}
 
           <button
             onClick={handleSkip}
-            className="w-full text-gray-400 font-medium py-3 text-sm active:text-white transition-colors"
+            className="w-full text-[#9CA3AF] font-medium py-3 text-sm active:text-[#6B7280] transition-colors"
           >
             Skip and continue →
           </button>
         </div>
 
-        <p className="text-xs text-gray-600 text-center max-w-xs">
+        <p className="text-xs text-[#9CA3AF] text-center max-w-xs">
           Leaving a review is completely optional and does not affect your reward.
         </p>
       </div>

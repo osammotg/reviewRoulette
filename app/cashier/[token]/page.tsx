@@ -66,17 +66,17 @@ export default function CashierPage() {
 
   if (loading) {
     return (
-      <main className="min-h-dvh flex items-center justify-center bg-gray-950">
-        <div className="text-gray-400 animate-pulse">Loading...</div>
+      <main className="min-h-dvh flex items-center justify-center bg-[#F8F5F0]">
+        <div className="text-[#9CA3AF] animate-pulse">Loading...</div>
       </main>
     );
   }
 
   if (error || !data) {
     return (
-      <main className="min-h-dvh flex flex-col items-center justify-center px-6 gap-4 bg-gray-950">
+      <main className="min-h-dvh flex flex-col items-center justify-center px-6 gap-4 bg-[#F8F5F0]">
         <div className="text-5xl">❌</div>
-        <p className="text-red-400 text-center text-lg font-semibold">
+        <p className="text-[#DC2626] text-center text-lg font-semibold">
           {error ?? "Claim not found."}
         </p>
       </main>
@@ -104,59 +104,61 @@ export default function CashierPage() {
   const isRedeemed = data.status === "redeemed";
 
   return (
-    <main className="min-h-dvh flex flex-col items-center px-4 py-8 safe-top safe-bottom gap-5 bg-gray-950">
+    <main className="min-h-dvh flex flex-col items-center px-4 py-8 safe-top safe-bottom gap-5 bg-[#F8F5F0]">
       {/* Restaurant name */}
-      <p className="text-gray-400 text-sm font-medium tracking-wide uppercase">
+      <p className="text-[#9CA3AF] text-sm font-medium tracking-wide uppercase">
         {data.restaurantName} — Cashier
       </p>
 
       {/* Status badge */}
       <div
         className={`w-full max-w-sm rounded-2xl py-4 px-6 text-center font-bold text-xl tracking-wide ${
-          isRedeemed ? "bg-gray-700 text-gray-300" : "bg-emerald-600 text-white"
+          isRedeemed
+            ? "bg-[#F1ECE4] text-[#9CA3AF]"
+            : "bg-[#D9F0E3] text-[#15803D]"
         }`}
       >
         {isRedeemed ? `REDEEMED at ${claimedAtFormatted}` : "NOT REDEEMED"}
       </div>
 
       {/* Prize */}
-      <div className="w-full max-w-sm bg-gray-900 rounded-3xl p-6 flex flex-col items-center gap-4 shadow-xl">
+      <div className="w-full max-w-sm bg-white rounded-2xl p-6 flex flex-col items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         {data.prize.imageUrl ? (
           <Image
             src={data.prize.imageUrl}
             alt={data.prize.label}
             width={100}
             height={100}
-            className="rounded-2xl object-cover"
+            className="rounded-[20px] object-cover"
           />
         ) : (
           <div className="text-6xl">{data.prize.emoji ?? "🎁"}</div>
         )}
 
         <div className="text-center">
-          <h1 className="text-2xl font-extrabold text-white">{data.prize.label}</h1>
+          <h1 className="text-2xl font-bold text-[#1F2937]">{data.prize.label}</h1>
           {data.prize.description && (
-            <p className="text-gray-400 text-sm mt-1">{data.prize.description}</p>
+            <p className="text-[#6B7280] text-sm mt-1">{data.prize.description}</p>
           )}
         </div>
       </div>
 
       {/* Time info */}
-      <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-4 space-y-2 text-sm">
+      <div className="w-full max-w-sm bg-white rounded-2xl p-4 space-y-2 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between">
-          <span className="text-gray-400">Won at</span>
-          <span className="font-mono font-semibold text-white">{wonAt}</span>
+          <span className="text-[#6B7280]">Won at</span>
+          <span className="font-mono font-semibold text-[#1F2937]">{wonAt}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-400">Current time</span>
+          <span className="text-[#6B7280]">Current time</span>
           <LiveClock
             timezone={data.timezone}
-            className="font-mono font-semibold text-white"
+            className="font-mono font-semibold text-[#1F2937]"
           />
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-400">Time since win</span>
-          <ElapsedTime since={data.wonAt} className="font-mono font-semibold text-amber-400" />
+          <span className="text-[#6B7280]">Time since win</span>
+          <ElapsedTime since={data.wonAt} className="font-mono font-semibold text-[#D97706]" />
         </div>
       </div>
 
@@ -165,19 +167,19 @@ export default function CashierPage() {
         <button
           onClick={handleRedeem}
           disabled={redeeming}
-          className="w-full max-w-sm bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold text-lg rounded-2xl py-5 shadow-lg active:scale-95 transition-all"
+          className="w-full max-w-sm bg-[#15803D] hover:bg-[#166534] disabled:bg-[#F1ECE4] disabled:text-[#9CA3AF] text-white font-bold text-lg rounded-full py-5 shadow-[0_4px_20px_rgba(21,128,61,0.2)] active:scale-95 transition-all"
         >
           {redeeming ? "Redeeming..." : "Redeem now"}
         </button>
       ) : (
-        <div className="w-full max-w-sm bg-gray-800 rounded-2xl py-5 px-6 text-center">
-          <p className="text-gray-400 font-semibold">
+        <div className="w-full max-w-sm bg-[#F1ECE4] rounded-2xl py-5 px-6 text-center">
+          <p className="text-[#9CA3AF] font-semibold">
             Already redeemed at {claimedAtFormatted}
           </p>
         </div>
       )}
 
-      <p className="text-gray-700 text-xs text-center max-w-xs">
+      <p className="text-[#9CA3AF] text-xs text-center max-w-xs">
         Staff only — do not share this page with customers.
       </p>
     </main>

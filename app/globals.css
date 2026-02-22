@@ -9,8 +9,8 @@
 }
 
 body {
-  background: #030712;
-  color: #f9fafb;
+  background: #F8F5F0;
+  color: #1F2937;
   font-family: var(--font-geist), system-ui, sans-serif;
   min-height: 100dvh;
 }

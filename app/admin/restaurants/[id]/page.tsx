@@ -28,11 +28,11 @@ export default async function RestaurantDetailPage({
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
       <div className="flex items-center gap-3">
-        <Link href="/admin" className="text-gray-400 hover:text-white text-sm">
+        <Link href="/admin" className="text-[#6B7280] hover:text-[#1F2937] text-sm transition-colors">
           ← Restaurants
         </Link>
-        <span className="text-gray-600">/</span>
-        <h1 className="text-xl font-bold">{restaurant.name}</h1>
+        <span className="text-[#9CA3AF]">/</span>
+        <h1 className="text-xl font-semibold text-[#1F2937]">{restaurant.name}</h1>
       </div>
 
       <RestaurantEditor restaurant={restaurant} />

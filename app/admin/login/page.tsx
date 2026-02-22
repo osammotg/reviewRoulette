@@ -37,46 +37,46 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="min-h-dvh flex items-center justify-center px-6">
+    <main className="min-h-dvh flex items-center justify-center px-6 bg-[#F8F5F0]">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold">Admin Login</h1>
-          <p className="text-gray-400 text-sm mt-1">Review Roulette</p>
+          <h1 className="text-2xl font-semibold text-[#1F2937]">Admin Login</h1>
+          <p className="text-[#6B7280] text-sm mt-1">Review Roulette</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
+            <label className="block text-sm text-[#6B7280] mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500"
+              className="w-full bg-white border border-[#E5E0D8] rounded-xl px-4 py-3 text-[#1F2937] placeholder-[#9CA3AF] focus:outline-none focus:border-[#D97706]"
               placeholder="admin@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Password</label>
+            <label className="block text-sm text-[#6B7280] mb-1">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500"
+              className="w-full bg-white border border-[#E5E0D8] rounded-xl px-4 py-3 text-[#1F2937] placeholder-[#9CA3AF] focus:outline-none focus:border-[#D97706]"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm">{error}</p>
+            <p className="text-[#DC2626] text-sm">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-gray-900 font-semibold rounded-xl py-3 disabled:opacity-50 transition-opacity"
+            className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-semibold rounded-full py-3 disabled:opacity-50 transition-colors"
           >
             {loading ? "Logging in..." : "Log in"}
           </button>

@@ -17,20 +17,20 @@ interface WheelProps {
   isSpinning: boolean;
 }
 
-// Curated premium palette — muted, not rainbow
+// Warm hospitality palette — amber, brown, stone
 const PRIZE_COLORS = [
-  "#6366F1", // indigo
-  "#8B5CF6", // violet
-  "#EC4899", // pink
-  "#F59E0B", // amber
-  "#10B981", // emerald
-  "#3B82F6", // blue
-  "#EF4444", // red
-  "#F97316", // orange
+  "#D97706", // amber
+  "#B45309", // dark amber
+  "#92400E", // warm brown
+  "#78350F", // deep brown
+  "#6B7280", // slate
+  "#374151", // charcoal
+  "#D44506", // burnt orange
+  "#9A5A0A", // sienna
 ];
 
-const NOOP_A = "#0C0C10";
-const NOOP_B = "#0F0F15";
+const NOOP_A = "#EFE9DF"; // warm cream
+const NOOP_B = "#E8E1D7"; // slightly darker cream
 const SPIN_DURATION_MS = 4500;
 const SIZE = 380; // logical px
 const SCALE = 2;  // retina 2×
@@ -87,7 +87,7 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
         ctx.fillStyle = noopIdx++ % 2 === 0 ? NOOP_A : NOOP_B;
         ctx.fill();
         // Very subtle divider between noop slices
-        ctx.strokeStyle = "rgba(255,255,255,0.025)";
+        ctx.strokeStyle = "rgba(0,0,0,0.06)";
         ctx.lineWidth = 0.5;
         ctx.stroke();
       } else {
@@ -99,7 +99,7 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
         ctx.fillStyle = g;
         ctx.fill();
         // Crisp border on prize slices so they pop
-        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.strokeStyle = "rgba(0,0,0,0.10)";
         ctx.lineWidth = 0.75;
         ctx.stroke();
 
@@ -136,45 +136,45 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
     // Outer rim ring
     ctx.beginPath();
     ctx.arc(cx, cy, rimR, 0, 2 * Math.PI);
-    ctx.strokeStyle = "rgba(255,255,255,0.07)";
+    ctx.strokeStyle = "rgba(0,0,0,0.08)";
     ctx.lineWidth = 2;
     ctx.stroke();
 
     // Inner edge highlight just inside the segments
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
-    ctx.strokeStyle = "rgba(255,255,255,0.04)";
+    ctx.strokeStyle = "rgba(0,0,0,0.04)";
     ctx.lineWidth = 1;
     ctx.stroke();
 
     // ── Centre hub ───────────────────────────────────────────────────────────
     // Shadow
-    ctx.shadowColor = "rgba(0,0,0,1)";
-    ctx.shadowBlur  = 24;
+    ctx.shadowColor = "rgba(0,0,0,0.3)";
+    ctx.shadowBlur  = 16;
     ctx.beginPath();
     ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
-    ctx.fillStyle = "#070710";
+    ctx.fillStyle = "#1F2937";
     ctx.fill();
     ctx.shadowBlur = 0;
 
     // Outer hub ring
     ctx.beginPath();
     ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
-    ctx.strokeStyle = "rgba(255,255,255,0.13)";
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
     ctx.lineWidth   = 1.5;
     ctx.stroke();
 
     // Inner hub ring
     ctx.beginPath();
     ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
-    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
     ctx.lineWidth   = 1;
     ctx.stroke();
 
     // Centre dot
     ctx.beginPath();
     ctx.arc(cx, cy, 4.5, 0, 2 * Math.PI);
-    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    ctx.fillStyle = "rgba(255,255,255,0.4)";
     ctx.fill();
 
   }, [segments]);
@@ -269,12 +269,12 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
         {/* Teardrop: circle top, tapers to a point at bottom */}
         <path
           d="M9 32 C4 22, 0 15, 0 9 A9 9 0 0 1 18 9 C18 15, 14 22, 9 32 Z"
-          fill="white"
+          fill="#D97706"
           fillOpacity="0.96"
           filter="url(#ptr-shadow)"
         />
         {/* Inner highlight */}
-        <circle cx="9" cy="9" r="4" fill="rgba(255,255,255,0.4)" />
+        <circle cx="9" cy="9" r="4" fill="rgba(255,255,255,0.35)" />
       </svg>
 
       {/* Outer glow / depth ring */}
@@ -285,9 +285,8 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
           height: SIZE,
           borderRadius: "50%",
           boxShadow:
-            "0 0 0 1px rgba(255,255,255,0.06), " +
-            "0 24px 80px rgba(0,0,0,0.7), " +
-            "0 4px 24px rgba(0,0,0,0.5)",
+            "0 0 0 1px rgba(0,0,0,0.06), " +
+            "0 8px 32px rgba(0,0,0,0.08)",
           pointerEvents: "none",
         }}
       />

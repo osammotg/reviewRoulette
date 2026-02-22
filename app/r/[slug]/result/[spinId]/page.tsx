@@ -72,16 +72,16 @@ export default function ResultPage() {
 
   if (loading) {
     return (
-      <main className="min-h-dvh flex items-center justify-center">
-        <div className="text-gray-400 animate-pulse text-lg">Loading...</div>
+      <main className="min-h-dvh flex items-center justify-center bg-[#F8F5F0]">
+        <div className="text-[#9CA3AF] animate-pulse text-lg">Loading...</div>
       </main>
     );
   }
 
   if (error || !result) {
     return (
-      <main className="min-h-dvh flex items-center justify-center px-6">
-        <p className="text-red-400 text-center">{error ?? "Result not found."}</p>
+      <main className="min-h-dvh flex items-center justify-center px-6 bg-[#F8F5F0]">
+        <p className="text-[#DC2626] text-center">{error ?? "Result not found."}</p>
       </main>
     );
   }
@@ -98,63 +98,65 @@ export default function ResultPage() {
     return (
       <main
         className={`min-h-dvh flex flex-col items-center px-4 py-8 safe-top safe-bottom gap-5 transition-colors duration-1000 ${
-          aged ? "bg-red-950" : "bg-gray-950"
+          aged ? "bg-red-50" : "bg-[#F8F5F0]"
         }`}
       >
         {/* Header badge */}
         <div
-          className={`w-full max-w-sm rounded-2xl py-3 px-4 text-center font-bold text-lg tracking-wide transition-colors duration-1000 ${
-            aged ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+          className={`w-full max-w-sm rounded-2xl py-3 px-4 text-center font-semibold text-base transition-colors duration-1000 ${
+            aged
+              ? "bg-red-100 text-[#DC2626]"
+              : "bg-[#FDE6C8] text-[#D97706]"
           }`}
         >
           {aged ? "⚠️ VALID – NOT REDEEMED" : "✅ VALID – NOT REDEEMED"}
         </div>
 
         {/* Prize display */}
-        <div className="w-full max-w-sm bg-gray-900 rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl">
+        <div className="w-full max-w-sm bg-white rounded-2xl p-6 flex flex-col items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
           {result.prize.imageUrl ? (
             <Image
               src={result.prize.imageUrl}
               alt={result.prize.label}
               width={120}
               height={120}
-              className="rounded-2xl object-cover"
+              className="rounded-[20px] object-cover"
             />
           ) : (
             <div className="text-7xl">{result.prize.emoji ?? "🎁"}</div>
           )}
 
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-white">{result.prize.label}</h1>
+            <h1 className="text-3xl font-bold text-[#1F2937]">{result.prize.label}</h1>
             {result.prize.description && (
-              <p className="text-gray-400 mt-1 text-sm">{result.prize.description}</p>
+              <p className="text-[#6B7280] mt-1 text-sm">{result.prize.description}</p>
             )}
           </div>
 
-          <p className="text-center text-gray-300 text-sm font-medium">
+          <p className="text-center text-[#6B7280] text-sm font-medium">
             Show this screen to the cashier
           </p>
         </div>
 
         {/* Time transparency */}
-        <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-4 space-y-2 text-sm">
+        <div className="w-full max-w-sm bg-white rounded-2xl p-4 space-y-2 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
           <div className="flex justify-between">
-            <span className="text-gray-400">Won at</span>
-            <span className="font-mono font-semibold text-white">{wonAt}</span>
+            <span className="text-[#6B7280]">Won at</span>
+            <span className="font-mono font-semibold text-[#1F2937]">{wonAt}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Current time</span>
-            <LiveClock timezone={result.timezone} className="font-mono font-semibold text-white" />
+            <span className="text-[#6B7280]">Current time</span>
+            <LiveClock timezone={result.timezone} className="font-mono font-semibold text-[#1F2937]" />
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Time since win</span>
+            <span className="text-[#6B7280]">Time since win</span>
             <ElapsedTime
               since={result.spunAt}
-              className={`font-mono font-semibold ${aged ? "text-red-400" : "text-emerald-400"}`}
+              className={`font-mono font-semibold ${aged ? "text-[#DC2626]" : "text-[#15803D]"}`}
             />
           </div>
           {aged && (
-            <p className="text-red-400 text-xs text-center pt-1">
+            <p className="text-[#DC2626] text-xs text-center pt-1">
               This reward is still valid — no expiry applies.
             </p>
           )}
@@ -162,21 +164,21 @@ export default function ResultPage() {
 
         {/* Claim code + QR */}
         {result.claimTokenShort && (
-          <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-5 flex flex-col items-center gap-4">
-            <p className="text-gray-400 text-sm">Claim code</p>
-            <p className="font-mono text-3xl font-bold tracking-[0.25em] text-white">
+          <div className="w-full max-w-sm bg-white rounded-2xl p-5 flex flex-col items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+            <p className="text-[#6B7280] text-sm">Claim code</p>
+            <p className="font-mono text-3xl font-bold tracking-[0.25em] text-[#1F2937]">
               {result.claimTokenShort}
             </p>
             {qrDataUrl && (
               <>
-                <p className="text-gray-400 text-xs">or scan for cashier</p>
+                <p className="text-[#9CA3AF] text-xs">or scan for cashier</p>
                 <Image src={qrDataUrl} alt="Claim QR code" width={160} height={160} />
               </>
             )}
           </div>
         )}
 
-        <p className="text-gray-600 text-xs text-center max-w-xs pb-4">
+        <p className="text-[#9CA3AF] text-xs text-center max-w-xs pb-4">
           {result.restaurantName}
         </p>
       </main>
@@ -185,33 +187,33 @@ export default function ResultPage() {
 
   // No-win result
   return (
-    <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-12 safe-top safe-bottom gap-8">
-      <div className="text-7xl">🎰</div>
+    <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-12 bg-[#F8F5F0] safe-top safe-bottom gap-8">
+      <div className="text-7xl">😔</div>
 
       <div className="text-center space-y-3">
-        <h1 className="text-3xl font-extrabold text-white">Not this time!</h1>
-        <p className="text-gray-400 text-base">
+        <h1 className="text-[30px] font-semibold text-[#1F2937]">Not this time!</h1>
+        <p className="text-[#6B7280] text-base">
           Thanks for stopping by. Come back tomorrow for another spin.
         </p>
       </div>
 
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       {(result as any).capReached && (
-        <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-4 text-center">
-          <p className="text-gray-300 text-sm">
+        <div className="w-full max-w-sm bg-white rounded-2xl p-4 text-center shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+          <p className="text-[#6B7280] text-sm">
             No more prizes available today — check back tomorrow!
           </p>
         </div>
       )}
 
       {/* Secondary review nudge */}
-      <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-5 flex flex-col items-center gap-3">
-        <p className="text-gray-300 text-sm text-center">
+      <div className="w-full max-w-sm bg-white rounded-2xl p-5 flex flex-col items-center gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <p className="text-[#6B7280] text-sm text-center">
           Enjoyed your visit? A review helps us a lot.
         </p>
         <Link
           href={`/r/${slug}`}
-          className="text-gray-500 text-sm underline"
+          className="text-[#D97706] text-sm font-medium underline"
         >
           Leave a Google review ↗
         </Link>
@@ -219,7 +221,7 @@ export default function ResultPage() {
 
       <Link
         href={`/r/${slug}`}
-        className="text-gray-500 text-sm"
+        className="text-[#9CA3AF] text-sm"
       >
         ← Back to start
       </Link>

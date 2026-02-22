@@ -50,7 +50,7 @@ const TIMEZONES = [
 ];
 
 const INPUT_CLASS =
-  "w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 text-sm";
+  "w-full bg-[#F8F5F0] border border-[#E5E0D8] rounded-xl px-4 py-2.5 text-[#1F2937] placeholder-[#9CA3AF] focus:outline-none focus:border-[#D97706] text-sm";
 
 export default function RestaurantEditor({
   restaurant,
@@ -124,13 +124,13 @@ export default function RestaurantEditor({
   }
 
   return (
-    <section className="bg-gray-900 rounded-2xl p-5 space-y-4">
-      <h2 className="font-semibold text-base">Restaurant settings</h2>
+    <section className="bg-white rounded-2xl p-5 space-y-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+      <h2 className="font-semibold text-base text-[#1F2937]">Restaurant settings</h2>
 
       <form onSubmit={handleSave} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-gray-400 mb-1 block">Name *</label>
+            <label className="text-xs text-[#6B7280] mb-1 block">Name *</label>
             <input
               type="text"
               value={form.name}
@@ -140,7 +140,7 @@ export default function RestaurantEditor({
             />
           </div>
           <div>
-            <label className="text-xs text-gray-400 mb-1 block">Slug *</label>
+            <label className="text-xs text-[#6B7280] mb-1 block">Slug *</label>
             <input
               type="text"
               value={form.slug}
@@ -153,7 +153,7 @@ export default function RestaurantEditor({
         </div>
 
         <div>
-          <label className="text-xs text-gray-400 mb-1 block">Logo URL</label>
+          <label className="text-xs text-[#6B7280] mb-1 block">Logo URL</label>
           <input
             type="url"
             value={form.logoUrl}
@@ -164,7 +164,7 @@ export default function RestaurantEditor({
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs text-gray-400 mb-1 block">Google review URL</label>
+          <label className="text-xs text-[#6B7280] mb-1 block">Google review URL</label>
           <textarea
             value={googleRaw}
             onChange={(e) => {
@@ -187,7 +187,7 @@ export default function RestaurantEditor({
 
           {googleRaw.trim() !== "" && parsedGoogle ? (
             <div className="space-y-2">
-              <p className="text-emerald-400 text-xs font-medium">✓ Restaurant ID found</p>
+              <p className="text-[#15803D] text-xs font-medium">✓ Restaurant ID found</p>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -195,10 +195,10 @@ export default function RestaurantEditor({
                     setLinkType("review");
                     setForm((f) => ({ ...f, googleUrl: parsedGoogle.reviewUrl }));
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     linkType === "review"
-                      ? "bg-emerald-600 text-white"
-                      : "bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white"
+                      ? "bg-[#D97706] text-white"
+                      : "bg-[#F1ECE4] text-[#6B7280] hover:bg-[#E5DDD0] hover:text-[#1F2937]"
                   }`}
                 >
                   Write review link
@@ -209,19 +209,19 @@ export default function RestaurantEditor({
                     setLinkType("maps");
                     setForm((f) => ({ ...f, googleUrl: parsedGoogle.mapsUrl }));
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     linkType === "maps"
-                      ? "bg-emerald-600 text-white"
-                      : "bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white"
+                      ? "bg-[#D97706] text-white"
+                      : "bg-[#F1ECE4] text-[#6B7280] hover:bg-[#E5DDD0] hover:text-[#1F2937]"
                   }`}
                 >
                   Maps link
                 </button>
               </div>
-              <p className="text-gray-500 text-xs truncate">{form.googleUrl}</p>
+              <p className="text-[#9CA3AF] text-xs truncate">{form.googleUrl}</p>
             </div>
           ) : googleRaw.trim() !== "" ? (
-            <p className="text-amber-400 text-xs">
+            <p className="text-[#DC2626] text-xs">
               ⚠️ Could not extract ID — paste a Google Maps URL, embed code, or Place ID (ChIJ...)
             </p>
           ) : (
@@ -237,7 +237,7 @@ export default function RestaurantEditor({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-gray-400 mb-1 block">Timezone</label>
+            <label className="text-xs text-[#6B7280] mb-1 block">Timezone</label>
             <select
               value={form.timezone}
               onChange={(e) => setForm((f) => ({ ...f, timezone: e.target.value }))}
@@ -251,7 +251,7 @@ export default function RestaurantEditor({
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-400 mb-1 block">Daily win cap</label>
+            <label className="text-xs text-[#6B7280] mb-1 block">Daily win cap</label>
             <input
               type="number"
               value={form.dailyWinCap}
@@ -270,17 +270,17 @@ export default function RestaurantEditor({
             onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
             className="w-4 h-4 rounded"
           />
-          <span className="text-sm text-gray-300">Promotion active</span>
+          <span className="text-sm text-[#6B7280]">Promotion active</span>
         </label>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
-        {success && <p className="text-emerald-400 text-sm">Saved.</p>}
+        {error && <p className="text-[#DC2626] text-sm">{error}</p>}
+        {success && <p className="text-[#15803D] text-sm">Saved.</p>}
 
         <div className="flex gap-3 pt-1">
           <button
             type="submit"
             disabled={saving}
-            className="bg-white text-gray-900 font-semibold px-5 py-2.5 rounded-xl text-sm disabled:opacity-50"
+            className="bg-[#D97706] hover:bg-[#B45309] text-white font-semibold px-5 py-2.5 rounded-full text-sm disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>
@@ -288,7 +288,7 @@ export default function RestaurantEditor({
             type="button"
             onClick={handleDelete}
             disabled={deleting}
-            className="text-red-400 hover:text-red-300 px-4 py-2.5 rounded-xl bg-gray-800 text-sm ml-auto"
+            className="text-[#DC2626] hover:text-red-700 px-4 py-2.5 rounded-xl bg-[#F1ECE4] text-sm ml-auto transition-colors"
           >
             {deleting ? "Deleting..." : "Delete restaurant"}
           </button>

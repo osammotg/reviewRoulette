@@ -32,25 +32,25 @@ export default function QRGenerator({ slug }: { slug: string }) {
   }
 
   return (
-    <section className="bg-gray-900 rounded-2xl p-5 space-y-4">
-      <h2 className="font-semibold text-base">QR Code</h2>
+    <section className="bg-white rounded-2xl p-5 space-y-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+      <h2 className="font-semibold text-base text-[#1F2937]">QR Code</h2>
 
-      <p className="text-sm text-gray-400 break-all">{landingUrl}</p>
+      <p className="text-sm text-[#6B7280] break-all">{landingUrl}</p>
 
       {qrDataUrl ? (
         <div className="flex flex-col items-start gap-3">
-          <div className="bg-white rounded-2xl p-4 inline-block">
+          <div className="bg-white rounded-2xl p-4 inline-block border border-[#E5E0D8]">
             <Image src={qrDataUrl} alt="QR code" width={200} height={200} />
           </div>
           <button
             onClick={handleDownload}
-            className="text-sm bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-xl"
+            className="text-sm bg-[#F1ECE4] hover:bg-[#E5DDD0] text-[#6B7280] hover:text-[#1F2937] px-4 py-2 rounded-xl transition-colors"
           >
             Download PNG
           </button>
         </div>
       ) : (
-        <div className="w-32 h-32 bg-gray-800 rounded-2xl animate-pulse" />
+        <div className="w-32 h-32 bg-[#F1ECE4] rounded-2xl animate-pulse" />
       )}
     </section>
   );
