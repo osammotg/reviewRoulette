@@ -4,13 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Restaurant } from "@/app/generated/prisma/client";
 
-function parseGoogleInput(input: string): string | null {
+interface ParsedGoogleResult {
+  reviewUrl: string;
+  mapsUrl: string;
+}
+
+function parseGoogleInput(input: string): ParsedGoogleResult | null {
   const text = input.trim();
 
   // 1. Direct Place ID (ChIJ...)
   const placeIdMatch = text.match(/ChIJ[A-Za-z0-9_-]{10,}/);
   if (placeIdMatch) {
-    return `https://search.google.com/local/writereview?placeid=${placeIdMatch[0]}`;
+    const placeId = placeIdMatch[0];
+    return {
+      reviewUrl: `https://search.google.com/local/writereview?placeid=${placeId}`,
+      mapsUrl: `https://www.google.com/maps/place/?q=place_id:${placeId}`,
+    };
   }
 
   // 2. Hex CID from Maps URL or iframe embed (handles %3A URL encoding)
@@ -18,11 +27,11 @@ function parseGoogleInput(input: string): string | null {
   const cidMatch = decoded.match(/!1s(0x[0-9a-f]+):(0x[0-9a-f]+)/i);
   if (cidMatch) {
     const cid = BigInt(cidMatch[2]).toString();
-    return `https://search.google.com/local/writereview?cid=${cid}`;
+    return {
+      reviewUrl: `https://search.google.com/local/writereview?cid=${cid}`,
+      mapsUrl: `https://www.google.com/maps?cid=${cid}`,
+    };
   }
-
-  // 3. Already a URL — use as-is
-  if (text.startsWith("http")) return text;
 
   return null;
 }
@@ -54,6 +63,8 @@ export default function RestaurantEditor({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [googleRaw, setGoogleRaw] = useState("");
+  const [parsedGoogle, setParsedGoogle] = useState<ParsedGoogleResult | null>(null);
+  const [linkType, setLinkType] = useState<"review" | "maps">("review");
   const [form, setForm] = useState({
     name: restaurant.name,
     slug: restaurant.slug,
@@ -159,31 +170,68 @@ export default function RestaurantEditor({
             onChange={(e) => {
               const raw = e.target.value;
               setGoogleRaw(raw);
-              if (raw.trim() === "") return;
-              const parsed = parseGoogleInput(raw);
-              if (parsed) setForm((f) => ({ ...f, googleUrl: parsed }));
+              if (raw.trim() === "") {
+                setParsedGoogle(null);
+                return;
+              }
+              const result = parseGoogleInput(raw);
+              setParsedGoogle(result);
+              if (result) {
+                setLinkType("review");
+                setForm((f) => ({ ...f, googleUrl: result.reviewUrl }));
+              }
             }}
             className={`${INPUT_CLASS} resize-none h-20`}
             placeholder="Paste your Google Maps URL, embed code, or Place ID (ChIJ...)"
           />
-          <input
-            type="text"
-            value={form.googleUrl}
-            onChange={(e) => setForm((f) => ({ ...f, googleUrl: e.target.value }))}
-            readOnly={googleRaw.trim() !== ""}
-            className={`${INPUT_CLASS} ${googleRaw.trim() !== "" ? "opacity-70 cursor-default" : ""}`}
-            placeholder="https://search.google.com/local/writereview?..."
-          />
-          {googleRaw.trim() !== "" && (
-            parseGoogleInput(googleRaw) ? (
-              <p className="text-emerald-400 text-xs">
-                ✓ Review link: {parseGoogleInput(googleRaw)}
-              </p>
-            ) : (
-              <p className="text-amber-400 text-xs">
-                ⚠️ Could not extract — using URL as-is
-              </p>
-            )
+
+          {googleRaw.trim() !== "" && parsedGoogle ? (
+            <div className="space-y-2">
+              <p className="text-emerald-400 text-xs font-medium">✓ Restaurant ID found</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLinkType("review");
+                    setForm((f) => ({ ...f, googleUrl: parsedGoogle.reviewUrl }));
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    linkType === "review"
+                      ? "bg-emerald-600 text-white"
+                      : "bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white"
+                  }`}
+                >
+                  Write review link
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLinkType("maps");
+                    setForm((f) => ({ ...f, googleUrl: parsedGoogle.mapsUrl }));
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    linkType === "maps"
+                      ? "bg-emerald-600 text-white"
+                      : "bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white"
+                  }`}
+                >
+                  Maps link
+                </button>
+              </div>
+              <p className="text-gray-500 text-xs truncate">{form.googleUrl}</p>
+            </div>
+          ) : googleRaw.trim() !== "" ? (
+            <p className="text-amber-400 text-xs">
+              ⚠️ Could not extract ID — paste a Google Maps URL, embed code, or Place ID (ChIJ...)
+            </p>
+          ) : (
+            <input
+              type="text"
+              value={form.googleUrl}
+              onChange={(e) => setForm((f) => ({ ...f, googleUrl: e.target.value }))}
+              className={INPUT_CLASS}
+              placeholder="https://search.google.com/local/writereview?..."
+            />
           )}
         </div>
 
