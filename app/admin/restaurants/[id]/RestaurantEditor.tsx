@@ -4,6 +4,29 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Restaurant } from "@/app/generated/prisma/client";
 
+function parseGoogleInput(input: string): string | null {
+  const text = input.trim();
+
+  // 1. Direct Place ID (ChIJ...)
+  const placeIdMatch = text.match(/ChIJ[A-Za-z0-9_-]{10,}/);
+  if (placeIdMatch) {
+    return `https://search.google.com/local/writereview?placeid=${placeIdMatch[0]}`;
+  }
+
+  // 2. Hex CID from Maps URL or iframe embed (handles %3A URL encoding)
+  const decoded = text.replace(/%3A/gi, ":");
+  const cidMatch = decoded.match(/!1s(0x[0-9a-f]+):(0x[0-9a-f]+)/i);
+  if (cidMatch) {
+    const cid = BigInt(cidMatch[2]).toString();
+    return `https://search.google.com/local/writereview?cid=${cid}`;
+  }
+
+  // 3. Already a URL — use as-is
+  if (text.startsWith("http")) return text;
+
+  return null;
+}
+
 const TIMEZONES = [
   "Europe/Zurich",
   "Europe/London",
@@ -30,6 +53,7 @@ export default function RestaurantEditor({
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [googleRaw, setGoogleRaw] = useState("");
   const [form, setForm] = useState({
     name: restaurant.name,
     slug: restaurant.slug,
@@ -128,15 +152,39 @@ export default function RestaurantEditor({
           />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <label className="text-xs text-gray-400 mb-1 block">Google review URL</label>
+          <textarea
+            value={googleRaw}
+            onChange={(e) => {
+              const raw = e.target.value;
+              setGoogleRaw(raw);
+              if (raw.trim() === "") return;
+              const parsed = parseGoogleInput(raw);
+              if (parsed) setForm((f) => ({ ...f, googleUrl: parsed }));
+            }}
+            className={`${INPUT_CLASS} resize-none h-20`}
+            placeholder="Paste your Google Maps URL, embed code, or Place ID (ChIJ...)"
+          />
           <input
-            type="url"
+            type="text"
             value={form.googleUrl}
             onChange={(e) => setForm((f) => ({ ...f, googleUrl: e.target.value }))}
-            className={INPUT_CLASS}
-            placeholder="https://maps.google.com/..."
+            readOnly={googleRaw.trim() !== ""}
+            className={`${INPUT_CLASS} ${googleRaw.trim() !== "" ? "opacity-70 cursor-default" : ""}`}
+            placeholder="https://search.google.com/local/writereview?..."
           />
+          {googleRaw.trim() !== "" && (
+            parseGoogleInput(googleRaw) ? (
+              <p className="text-emerald-400 text-xs">
+                ✓ Review link: {parseGoogleInput(googleRaw)}
+              </p>
+            ) : (
+              <p className="text-amber-400 text-xs">
+                ⚠️ Could not extract — using URL as-is
+              </p>
+            )
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
