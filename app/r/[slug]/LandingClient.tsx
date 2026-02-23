@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -16,6 +16,7 @@ interface Props {
 
 export default function LandingClient({ restaurant }: Props) {
   const router = useRouter();
+  const [reviewOpened, setReviewOpened] = useState(false);
 
   useEffect(() => {
     // Track landing_view once per browser session
@@ -41,38 +42,71 @@ export default function LandingClient({ restaurant }: Props) {
       window.open(restaurant.googleUrl, "_blank", "noopener,noreferrer");
     }
 
-    // Proceed to spin after a short delay to let the new tab open
-    setTimeout(() => {
-      router.push(`/r/${restaurant.slug}/spin`);
-    }, 400);
+    setReviewOpened(true);
   }
 
   function handleSkip() {
     router.push(`/r/${restaurant.slug}/spin`);
   }
 
+  const logoBlock = (
+    <div className="flex flex-col items-center gap-4">
+      {restaurant.logoUrl ? (
+        <Image
+          src={restaurant.logoUrl}
+          alt={restaurant.name}
+          width={96}
+          height={96}
+          className="rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+        />
+      ) : (
+        <div className="w-24 h-24 rounded-[20px] bg-[#F1ECE4] flex items-center justify-center text-4xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+          🍽️
+        </div>
+      )}
+      <h2 className="text-lg font-semibold text-[#6B7280] text-center">
+        {restaurant.name}
+      </h2>
+    </div>
+  );
+
+  if (reviewOpened) {
+    return (
+      <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-12 bg-[#F8F5F0] safe-top safe-bottom">
+        <div className="w-full max-w-sm flex flex-col items-center gap-8">
+          {logoBlock}
+
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="text-6xl">✅</span>
+            <p className="text-[#1F2937] text-lg font-medium">
+              Thanks! Finish your review on Google, then come back here.
+            </p>
+          </div>
+
+          <div className="w-full flex flex-col gap-4">
+            <button
+              onClick={() => router.push(`/r/${restaurant.slug}/spin`)}
+              className="w-full bg-[#D97706] hover:bg-[#B45309] text-white font-semibold rounded-full py-4 px-6 text-base flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(217,119,6,0.25)] active:scale-95 transition-all"
+            >
+              <span>I&apos;ve left my review →</span>
+            </button>
+
+            <button
+              onClick={() => router.push(`/r/${restaurant.slug}/spin`)}
+              className="w-full text-[#9CA3AF] font-medium py-3 text-sm active:text-[#6B7280] transition-colors"
+            >
+              Skip and continue →
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-12 bg-[#F8F5F0] safe-top safe-bottom">
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
-        {/* Logo / Restaurant name */}
-        <div className="flex flex-col items-center gap-4">
-          {restaurant.logoUrl ? (
-            <Image
-              src={restaurant.logoUrl}
-              alt={restaurant.name}
-              width={96}
-              height={96}
-              className="rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-[20px] bg-[#F1ECE4] flex items-center justify-center text-4xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-              🍽️
-            </div>
-          )}
-          <h2 className="text-lg font-semibold text-[#6B7280] text-center">
-            {restaurant.name}
-          </h2>
-        </div>
+        {logoBlock}
 
         {/* Hero text */}
         <div className="text-center space-y-3">

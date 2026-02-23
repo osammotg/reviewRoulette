@@ -188,6 +188,18 @@ export default function Wheel({ segments, targetIndex, onSpinComplete, isSpinnin
     drawWheel(displayRotation);
   }, [displayRotation, drawWheel]);
 
+  // iOS Safari can clear the canvas context when the tab is backgrounded.
+  // Redraw the wheel at its current rotation whenever the tab becomes visible.
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        drawWheel(rotationRef.current);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [drawWheel]);
+
   useEffect(() => {
     if (!isSpinning || targetIndex === null) return;
 

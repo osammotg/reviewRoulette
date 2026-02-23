@@ -146,6 +146,15 @@ export default function SpinPage() {
     );
   }
 
+  if (!loading && restaurant && segments.length === 0) {
+    return (
+      <main className="min-h-dvh flex flex-col items-center justify-center px-6 text-center gap-6 bg-[#F8F5F0]">
+        <div className="text-5xl">🎡</div>
+        <p className="text-[#6B7280]">No prizes are set up for this promotion yet.</p>
+      </main>
+    );
+  }
+
   if (rateLimited) {
     const next = rateLimited.nextEligibleAt
       ? new Date(rateLimited.nextEligibleAt).toLocaleTimeString([], {
